@@ -5,6 +5,7 @@ import InformesView from './views/InformesView'
 import { motion } from 'framer-motion'
 import { Sidebar, type SidebarKey } from './components/Sidebar'
 import './App.css'
+import ProveedoresView from './views/ProveedoresView'
 
 function App() {
   const [token, setToken] = useState<string | null>(null)
@@ -42,7 +43,7 @@ function App() {
         <main className="flex-1 min-w-0">
           <section>
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} className="rounded-3xl border border-white/30 bg-white/70 backdrop-blur shadow-sm">
-              {view === 'carga' ? <CargaFacturaView /> : <InformesView />}
+              {view === 'carga' ? <CargaFacturaView /> : view === 'informes' ? <InformesView /> : <ProveedoresView />}
             </motion.div>
           </section>
         </main>

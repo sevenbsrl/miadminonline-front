@@ -1,7 +1,5 @@
 import { getAuthHeaders, logout } from './auth'
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
-
 export type PurchaseItemTotals = {
   base21: number
   base105: number
@@ -11,6 +9,7 @@ export type PurchaseItemTotals = {
   percepIVA: number
   percepIIBB: number
   otros: number
+  municipality: number
 }
 
 export type PurchasePayload = {
@@ -28,18 +27,42 @@ export type Purchase = PurchasePayload & {
 }
 
 export async function createPurchase(payload: PurchasePayload): Promise<{ ok: boolean; id: string }> {
-  const headers = { 'Content-Type': 'application/json', ...getAuthHeaders() }
-  const res = await fetch(`${BASE_URL}/purchases`, {
+  // Mapear al formato del backend de invoices
+  const INVOICE_BASE = (import.meta.env.VITE_INVOICE_BASE as string) || 'http://localhost:8080'
+  const engraved = (payload.base21 || 0) + (payload.base105 || 0) + (payload.base27 || 0)
+  const body = {
+    id: null,
+    pointSale: Number(payload.pv) || 0,
+    number: Number(payload.nro) || 0,
+    provider: Number(payload.proveedorId) || 0,
+    date: payload.fecha,
+    engraved,
+    exempt: payload.exento || 0,
+    iva105: +(payload.base105 * 0.105).toFixed(2),
+    iva21: +(payload.base21 * 0.21).toFixed(2),
+    iva27: +(payload.base27 * 0.27).toFixed(2),
+    iibb: payload.percepIIBB || 0,
+    taxedOthers: payload.otros || 0,
+    municipality: payload.municipality || 0,
+    impacted: false,
+  }
+
+  const res = await fetch(`${INVOICE_BASE}/v1/retenciones/invoice`, {
     method: 'POST',
-    headers,
-    body: JSON.stringify(payload),
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify(body),
   })
   if (res.status === 401) {
     logout()
     throw new Error('AUTH')
   }
   if (!res.ok) throw new Error(await res.text() || 'Error creando compra')
-  return res.json()
+  const json = await res.json().catch(() => ({}))
+  return { ok: true, id: String(json?.id ?? '') }
 }
 
 export async function getPurchases(params: { from?: string; to?: string; proveedorId?: string }): Promise<Purchase[]> {
@@ -85,7 +108,8 @@ export async function getPurchases(params: { from?: string; to?: string; proveed
     const base21 = toBase(inv.iva21 || 0, 0.21)
     const base105 = toBase(inv.iva105 || 0, 0.105)
     const base27 = toBase(inv.iva27 || 0, 0.27)
-    const otros = (inv.taxedOthers || 0) + (inv.municipality || 0)
+    const otros = inv.taxedOthers || 0
+    const muni = inv.municipality || 0
     const r: Purchase = {
       id: String(inv.id),
       proveedorId: String(inv.provider?.id ?? ''),
@@ -102,7 +126,8 @@ export async function getPurchases(params: { from?: string; to?: string; proveed
       noGravado: 0,
       percepIVA: 0,
       percepIIBB: inv.iibb || 0,
-      otros,
+      otros, // ahora solo taxedOthers
+      municipality: muni,
     }
     return r
   })

@@ -13,7 +13,7 @@ export default function CargaFacturaView() {
   const [nro, setNro] = useState('')
   const [fecha, setFecha] = useState(dayjs().format('YYYY-MM-DD'))
   const [fields, setFields] = useState({
-    base21: 0, base105: 0, base27: 0, exento: 0, noGravado: 0, percepIVA: 0, percepIIBB: 0, otros: 0,
+    base21: 0, base105: 0, base27: 0, exento: 0, noGravado: 0, percepIVA: 0, percepIIBB: 0, otros: 0, municipality: 0,
   })
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
@@ -49,7 +49,7 @@ export default function CargaFacturaView() {
 
   function handleClear() {
     setPv(''); setNro(''); setFecha(dayjs().format('YYYY-MM-DD'))
-    setFields({ base21: 0, base105: 0, base27: 0, exento: 0, noGravado: 0, percepIVA: 0, percepIIBB: 0, otros: 0 })
+    setFields({ base21: 0, base105: 0, base27: 0, exento: 0, noGravado: 0, percepIVA: 0, percepIIBB: 0, otros: 0, municipality: 0 })
     formRef.current?.reset()
     setProveedor(null)
   }
@@ -101,9 +101,10 @@ export default function CargaFacturaView() {
             ['noGravado','No gravado'],
             ['percepIVA','Percep. IVA'],
             ['percepIIBB','Percep. IIBB'],
+            ['municipality','Municipalidad'],
             ['otros','Otros'],
           ].map(([key, label]) => (
-            <div key={key}>
+            <div key={key as string}>
               <Label htmlFor={key as string}>{label}</Label>
               <Input id={key as string} inputMode="decimal" onChange={(e) => handleNumChange(key as any, e.target.value)} placeholder="0,00" />
             </div>

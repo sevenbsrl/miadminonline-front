@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion'
 import React from 'react'
-import { FileText, BarChart, ChevronDown } from 'lucide-react'
+import { FileText, BarChart, ChevronDown, Users } from 'lucide-react'
 
-export type SidebarKey = 'carga' | 'informes'
+export type SidebarKey = 'carga' | 'informes' | 'proveedores'
 
 type Props = {
   active: SidebarKey
@@ -21,6 +21,12 @@ export function Sidebar({ active, onNavigate }: Props) {
       label: 'Informes',
       items: [
         { key: 'informes' as SidebarKey, label: 'Compras', icon: BarChart },
+      ],
+    },
+    {
+      label: 'proveedores',
+      items: [
+        { key: 'proveedores' as SidebarKey, label: 'Proveedores', icon: Users },
       ],
     },
   ]

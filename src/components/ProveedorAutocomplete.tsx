@@ -106,7 +106,6 @@ export default function ProveedorAutocomplete({ onSelect, onNotFound, autoFocusH
           aria-controls={listId}
           aria-activedescendant={open && activeIdx >= 0 ? `${listId}-opt-${activeIdx}` : undefined}
         />
-        <span className="text-xs text-gray-500">Atajo <kbd>Alt</kbd>+<kbd>F</kbd></span>
       </div>
       <div className="sr-only" aria-live="polite">
         {loading ? 'Cargando proveedores…' : `${items.length} resultados`}
