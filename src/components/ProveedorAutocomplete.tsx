@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { fetchProviders, type Provider } from '../api/providers'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import type React from 'react'
+import { fetchProviders, type ProviderBasic as Provider } from '../api/providers'
 import { Input } from './ui/Input'
 
 function useDebouncedValue<T>(value: T, delay = 250) {

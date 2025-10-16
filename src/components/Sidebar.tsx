@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion'
-import React from 'react'
 import { FileText, BarChart, ChevronDown, Users } from 'lucide-react'
 
 export type SidebarKey = 'carga' | 'informes' | 'proveedores'

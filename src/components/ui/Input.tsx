@@ -1,4 +1,5 @@
-import React from 'react'
+import { forwardRef } from 'react'
+import type React from 'react'
 
 function cx(...cls: Array<string | false | null | undefined>) {
   return cls.filter(Boolean).join(' ')
@@ -6,7 +7,7 @@ function cx(...cls: Array<string | false | null | undefined>) {
 
 type Props = React.InputHTMLAttributes<HTMLInputElement>
 
-export const Input = React.forwardRef<HTMLInputElement, Props>(function Input(
+export const Input = forwardRef<HTMLInputElement, Props>(function Input(
   { className, ...props },
   ref
 ) {

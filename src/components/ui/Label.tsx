@@ -1,4 +1,4 @@
-import React from 'react'
+import type React from 'react'
 
 function cx(...cls: Array<string | false | null | undefined>) {
   return cls.filter(Boolean).join(' ')
