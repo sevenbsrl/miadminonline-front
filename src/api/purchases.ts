@@ -28,7 +28,7 @@ export type Purchase = PurchasePayload & {
 
 export async function createPurchase(payload: PurchasePayload): Promise<{ ok: boolean; id: string }> {
   // Mapear al formato del backend de invoices
-  const INVOICE_BASE = (import.meta.env.VITE_INVOICE_BASE as string) || 'http://localhost:8080'
+  const INVOICE_BASE = (import.meta.env.VITE_INVOICE_BASE as string) || 'https://miadminonline-69af95b5b5a1.herokuapp.com'
   const engraved = (payload.base21 || 0) + (payload.base105 || 0) + (payload.base27 || 0)
   const body = {
     id: null,
@@ -74,7 +74,7 @@ export async function getPurchases(params: { from?: string; to?: string; proveed
   if (params.proveedorId) usp.set('idProvider', params.proveedorId)
 
   // Base del servicio de retenciones local (ajustar si difiere)
-  const RET_BASE = (import.meta.env.VITE_RETENCIONES_BASE as string) || 'http://localhost:8080/v1/retenciones'
+  const RET_BASE = (import.meta.env.VITE_RETENCIONES_BASE as string) || 'https://miadminonline-69af95b5b5a1.herokuapp.com/v1/retenciones'
   const url = `${RET_BASE}/invoice?${usp.toString()}`
 
   const headers = getAuthHeaders()
