@@ -52,9 +52,10 @@ export function calcTotal(fields: {
   percepIVA: number
   percepIIBB: number
   otros: number
+  municipality: number
 }) {
   const { iva21, iva105, iva27, totalIVA } = calcIVA(fields)
   const subtotal = fields.base21 + fields.base105 + fields.base27 + fields.exento + fields.noGravado
-  const total = Math.round(((subtotal + totalIVA + fields.percepIVA + fields.percepIIBB + fields.otros) + Number.EPSILON) * 100) / 100
+  const total = Math.round(((subtotal + totalIVA + fields.percepIVA + fields.percepIIBB + fields.municipality + fields.otros) + Number.EPSILON) * 100) / 100
   return { iva21, iva105, iva27, totalIVA, subtotal: Math.round((subtotal + Number.EPSILON) * 100) / 100, total }
 }

@@ -6,12 +6,15 @@ import { Button } from '../components/ui/Button'
 import dayjs from 'dayjs'
 import { createPurchase } from '../api/purchases'
 import { calcTotal, toNumber } from '../utils/numbers'
+import { getAuthHeaders, logout } from '../api/auth'
 
 export default function CargaFacturaView() {
   const [proveedor, setProveedor] = useState<{ id: string; nombre: string } | null>(null)
   const [pv, setPv] = useState('')
   const [nro, setNro] = useState('')
   const [fecha, setFecha] = useState(dayjs().format('YYYY-MM-DD'))
+  const [invoiceTypes, setInvoiceTypes] = useState<Array<{ id: number; code: string; name: string }>>([])
+  const [invoiceTypeId, setInvoiceTypeId] = useState<number | ''>('')
   const [fields, setFields] = useState({
     base21: 0, base105: 0, base27: 0, exento: 0, noGravado: 0, percepIVA: 0, percepIIBB: 0, otros: 0, municipality: 0,
   })
@@ -26,9 +29,25 @@ export default function CargaFacturaView() {
     setFields((prev) => ({ ...prev, [key]: toNumber(v) }))
   }
 
+  async function loadInvoiceTypes() {
+    try {
+      const BASE = (import.meta.env.VITE_INVOICE_BASE as string) || 'http://localhost:8080'
+      const res = await fetch(`${BASE}/v1/retenciones/invoice-type`, { headers: { ...getAuthHeaders() } })
+      if (res.status === 401) { logout(); throw new Error('AUTH') }
+      if (!res.ok) throw new Error(await res.text() || 'Error cargando tipos de factura')
+      const data = await res.json()
+      setInvoiceTypes(Array.isArray(data) ? data : [])
+    } catch (e: any) {
+      setError(e.message || 'Error cargando tipos de factura')
+    }
+  }
+
+  useEffect(() => { loadInvoiceTypes() }, [])
+
   async function handleSubmit(e?: React.FormEvent) {
     if (e) e.preventDefault()
     if (!proveedor) { setError('Seleccione proveedor'); return }
+    if (!invoiceTypeId) { setError('Seleccione tipo de factura'); return }
     setLoading(true)
     setMessage(null)
     setError(null)
@@ -36,6 +55,7 @@ export default function CargaFacturaView() {
       const res = await createPurchase({
         proveedorId: proveedor.id,
         pv, nro, fecha,
+        invoiceTypeId: Number(invoiceTypeId),
         ...fields,
       })
       setMessage(res.ok ? 'Guardado con éxito' : 'No se pudo guardar')
@@ -49,6 +69,7 @@ export default function CargaFacturaView() {
 
   function handleClear() {
     setPv(''); setNro(''); setFecha(dayjs().format('YYYY-MM-DD'))
+    setInvoiceTypeId('')
     setFields({ base21: 0, base105: 0, base27: 0, exento: 0, noGravado: 0, percepIVA: 0, percepIIBB: 0, otros: 0, municipality: 0 })
     formRef.current?.reset()
     setProveedor(null)
@@ -75,7 +96,16 @@ export default function CargaFacturaView() {
           <ProveedorAutocomplete onSelect={(p) => setProveedor({ id: String(p.id), nombre: p.companyName })} />
           {proveedor && <div className="text-sm text-gray-600 mt-1">Seleccionado: {proveedor.nombre}</div>}
         </div>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div>
+            <Label htmlFor="invoiceType">Tipo de factura</Label>
+            <select id="invoiceType" className="w-full rounded-xl border border-white/30 bg-white/70 p-2" value={invoiceTypeId} onChange={(e) => setInvoiceTypeId(e.target.value ? Number(e.target.value) : '')} required>
+              <option value="" disabled>Seleccionar…</option>
+              {invoiceTypes.map((t) => (
+                <option key={t.id} value={t.id}>{t.name}</option>
+              ))}
+            </select>
+          </div>
           <div>
             <Label htmlFor="pv">PV</Label>
             <Input id="pv" value={pv} onChange={(e) => setPv(e.target.value)} required aria-describedby="pv-help" />

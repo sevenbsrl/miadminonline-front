@@ -56,6 +56,7 @@ export default function InformesView() {
       const total = base + iva21 + iva105 + iva27 + r.percepIVA + r.percepIIBB + (r.municipality || 0) + r.otros
       return {
         fecha: r.fecha,
+        codigo: r.invoiceTypeCode || '',
         proveedor: r.proveedorNombre,
         cuit: r.proveedorCUIT || '',
         'pv/nro': `${r.pv}/${r.nro}`,
@@ -153,7 +154,7 @@ export default function InformesView() {
           <table className="min-w-full text-sm">
             <thead className="bg-gray-100 sticky top-0 z-10">
               <tr>
-                {['Fecha','Proveedor','CUIT','PV/Nro','Base','Exento','No Grav','IVA 21','IVA 10.5','IVA 27','Percep IVA','Percep IIBB','Muni','Otros','Total'].map(h => (
+                {['Fecha','Código','Proveedor','CUIT','PV/Nro','Base','Exento','No Grav','IVA 21','IVA 10.5','IVA 27','Percep IVA','Percep IIBB','Muni','Otros','Total'].map(h => (
                   <th key={h} className="px-2 py-2 text-left whitespace-nowrap font-medium text-gray-700">{h}</th>
                 ))}
               </tr>
@@ -168,6 +169,7 @@ export default function InformesView() {
                 return (
                   <tr key={r.id} className={i % 2 ? 'bg-gray-50' : 'bg-white'}>
                     <td className="px-2 py-2 whitespace-nowrap">{r.fecha}</td>
+                    <td className="px-2 py-2 whitespace-nowrap">{r.invoiceTypeCode || ''}</td>
                     <td className="px-2 py-2 whitespace-nowrap">{r.proveedorNombre}</td>
                     <td className="px-2 py-2 whitespace-nowrap">{r.proveedorCUIT || ''}</td>
                     <td className="px-2 py-2 whitespace-nowrap">{r.pv}/{r.nro}</td>

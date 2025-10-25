@@ -17,6 +17,7 @@ export type PurchasePayload = {
   pv: string
   nro: string
   fecha: string // ISO
+  invoiceTypeId?: number
 } & PurchaseItemTotals
 
 export type Purchase = PurchasePayload & {
@@ -24,6 +25,7 @@ export type Purchase = PurchasePayload & {
   proveedorNombre: string
   proveedorCUIT?: string
   engraved?: number
+  invoiceTypeCode?: string
 }
 
 export async function createPurchase(payload: PurchasePayload): Promise<{ ok: boolean; id: string }> {
@@ -36,7 +38,10 @@ export async function createPurchase(payload: PurchasePayload): Promise<{ ok: bo
     number: Number(payload.nro) || 0,
     provider: Number(payload.proveedorId) || 0,
     date: payload.fecha,
+    // Enviar discriminado
     engraved,
+    engraved105: payload.base105 || 0,
+    engraved27: payload.base27 || 0,
     exempt: payload.exento || 0,
     iva105: +(payload.base105 * 0.105).toFixed(2),
     iva21: +(payload.base21 * 0.21).toFixed(2),
@@ -45,6 +50,7 @@ export async function createPurchase(payload: PurchasePayload): Promise<{ ok: bo
     taxedOthers: payload.otros || 0,
     municipality: payload.municipality || 0,
     impacted: false,
+    invoiceTypeId: payload.invoiceTypeId ?? null,
   }
 
   const res = await fetch(`${INVOICE_BASE}/v1/retenciones/invoice`, {
@@ -100,6 +106,7 @@ export async function getPurchases(params: { from?: string; to?: string; proveed
     iibb: number
     taxedOthers: number
     municipality: number
+    invoiceType?: { id: number; code: string; name: string; description?: string }
   }
 
   const toBase = (iva: number, rate: number) => (iva > 0 ? +(iva / rate).toFixed(2) : 0)
@@ -128,6 +135,7 @@ export async function getPurchases(params: { from?: string; to?: string; proveed
       percepIIBB: inv.iibb || 0,
       otros, // ahora solo taxedOthers
       municipality: muni,
+      invoiceTypeCode: inv.invoiceType?.code || '',
     }
     return r
   })

@@ -14,6 +14,12 @@ function App() {
 
   useEffect(() => { setToken(localStorage.getItem('token')) }, [])
 
+  useEffect(() => {
+    const handler = () => setToken(null)
+    window.addEventListener('auth:logout', handler)
+    return () => window.removeEventListener('auth:logout', handler)
+  }, [])
+
   if (!token) return <LoginView onLogin={() => setToken(localStorage.getItem('token'))} />
 
   return (

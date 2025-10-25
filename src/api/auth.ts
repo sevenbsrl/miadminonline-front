@@ -49,4 +49,8 @@ export function getAuthHeaders(): Record<string, string> {
 
 export function logout() {
   localStorage.removeItem('token')
+  // Avisar al resto de la app (incluido App.tsx) que la sesión terminó
+  try {
+    window.dispatchEvent(new Event('auth:logout'))
+  } catch {}
 }
