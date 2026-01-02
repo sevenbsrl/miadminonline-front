@@ -31,7 +31,7 @@ export default function CargaFacturaView() {
 
   async function loadInvoiceTypes() {
     try {
-      const BASE = (import.meta.env.VITE_INVOICE_BASE as string) || 'http://localhost:8080' // 'https://miadminonline-69af95b5b5a1.herokuapp.com'
+      const BASE = (import.meta.env.VITE_INVOICE_BASE as string) ||  'https://miadminonline-69af95b5b5a1.herokuapp.com'
       const res = await fetch(`${BASE}/v1/retenciones/invoice-type`, { headers: { ...getAuthHeaders() } })
       if (res.status === 401) { logout(); throw new Error('AUTH') }
       if (!res.ok) throw new Error(await res.text() || 'Error cargando tipos de factura')
