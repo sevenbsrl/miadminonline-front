@@ -30,7 +30,7 @@ export type Purchase = PurchasePayload & {
 
 export async function createPurchase(payload: PurchasePayload): Promise<{ ok: boolean; id: string }> {
   // Mapear al formato del backend de invoices
-  const INVOICE_BASE = 'http://localhost:8080' //(import.meta.env.VITE_INVOICE_BASE as string) ||  //'https://miadminonline-69af95b5b5a1.herokuapp.com'
+  const INVOICE_BASE = (import.meta.env.VITE_INVOICE_BASE as string) || 'https://miadminonline-69af95b5b5a1.herokuapp.com'
   const engraved = (payload.base21 || 0) + (payload.base105 || 0) + (payload.base27 || 0)
   const body = {
     id: null,
