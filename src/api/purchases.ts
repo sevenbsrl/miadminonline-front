@@ -108,6 +108,7 @@ export async function getPurchases(params: { from?: string; to?: string; proveed
     taxedOthers: number
     municipality: number
     invoiceType?: { id: number; code: string; name: string; description?: string }
+    nonTaxableAmount?: number | null
   }
 
   const toBase = (iva: number, rate: number) => (iva > 0 ? +(iva / rate).toFixed(2) : 0)
@@ -118,6 +119,7 @@ export async function getPurchases(params: { from?: string; to?: string; proveed
     const base27 = toBase(inv.iva27 || 0, 0.27)
     const otros = inv.taxedOthers || 0
     const muni = inv.municipality || 0
+    const noGravado = inv.nonTaxableAmount ?? 0
     const r: Purchase = {
       id: String(inv.id),
       proveedorId: String(inv.provider?.id ?? ''),
@@ -131,7 +133,7 @@ export async function getPurchases(params: { from?: string; to?: string; proveed
       base105,
       base27,
       exento: inv.exempt || 0,
-      noGravado: 0,
+      noGravado,
       percepIVA: 0,
       percepIIBB: inv.iibb || 0,
       otros, // ahora solo taxedOthers
